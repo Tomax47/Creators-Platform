@@ -9,13 +9,19 @@
 
     <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
+
+  <body class="h-full">
+  <%= render 'static_pages/nav' %>
+
   <p class="notice"><%= notice %></p>
   <p class="alert"><%= alert %></p>
 
-  <body class="h-full">
-    <main>
-      <%= yield %>
-    </main>
+  <main>
+    <%= yield %>
+  </main>
+
+  <%= render 'static_pages/footer' %>
   </body>
 </html>
