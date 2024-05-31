@@ -1,4 +1,4 @@
 web: env RUBY_DEBUG_OPEN=true bin/rails server -p 3000
 css: bin/rails tailwindcss:watch
 worker: bundle exec sidekiq
-Enqueued 
+stripe: stripe listen --forward-to localhost:3000/webhooks/stripe --forward-connect-to localhost:3000/webhooks/stripe
