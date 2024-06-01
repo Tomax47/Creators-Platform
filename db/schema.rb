@@ -10,10 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_05_31_132706) do
+ActiveRecord::Schema.define(version: 2024_06_01_090458) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "accounts", force: :cascade do |t|
+    t.string "stripe_id"
+    t.boolean "payouts_enabled"
+    t.boolean "charges_enabled"
+    t.bigint "user_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_accounts_on_user_id"
+  end
 
 # Could not dump table "events" because of following StandardError
 #   Unknown type 'status' for column 'status'
@@ -35,4 +45,5 @@ ActiveRecord::Schema.define(version: 2024_05_31_132706) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "accounts", "users"
 end
