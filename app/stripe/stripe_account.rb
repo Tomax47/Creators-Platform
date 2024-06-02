@@ -34,7 +34,64 @@ class StripeAccount
     )
     account.update(stripe_id: stripe_account.id)
   end
+  def ensure_financial_account
+    return if !account.financial_account_id.nil?
 
+    # Stripe financial account docs https://docs.stripe.com/treasury/account-management/financial-accounts
+    financial_account = Stripe::Treasury::FinancialAccount.create(
+      {
+        supported_currencies: ['usd'],
+        features: {
+          card_issuing: { requested: true },
+          deposit_insurance: { requested: true },
+          # Requesting access to the account routing number "Like the bank account routing number"
+          financial_addresses: { aba: { requested: true } },
+          inbound_transfers: { ach: { requested: true } },
+          intra_stripe_flows: { requested: true },
+          outbound_payments: {
+            ach: { requested: true },
+            us_domestic_wire: { requested: true },
+          },
+          outbound_transfers: {
+            ach: { requested: true },
+            us_domestic_wire: { requested: true },
+          },
+        },
+      },
+        # Passing the stripe account header for the user account to create the financial account
+        header)
+  end
+
+  def retrieve_financila_account
+    @financial_account ||= Stripe::Treasury::FinancialAccount.retrieve(
+      {
+        id: account.financial_account_id,
+        # Expanding to get the account number to be sued later on for issuing "Default financial account retrieval does not get this number back without specifying through expand"
+        expand: ['financial_addresses.aba.account_number'],
+      }, header)
+  end
+  def ensure_external_account
+    return if !account.external_account_id.nil?
+    # Fetching the financial account
+    account_info = financial_account.financial_addresses.first.aba
+
+    # Using the aba addresses on the financial account to create ana external account
+    bank_account = Stripe::Account.create_external_account(
+      account.stripe_id,
+      {
+        external_account: {
+        object: 'bank_account',
+        account_number: account_info.account_number,
+        routing_number: account_info.routing_number,
+        country: 'US',
+        currency: 'usd'
+        },
+        default_for_currency: true,
+      })
+
+    # Updating account's external id
+    account.update(external_account_id: bank_account.id)
+  end
   def onboarding_url
     Stripe::AccountLink.create({
         account: account.stripe_id,
@@ -43,5 +100,10 @@ class StripeAccount
         type: 'account_onboarding',
         collect: 'eventually_due',
       }).url
+  end
+
+  # Helper
+  def header
+    { stripe_account: account.stripe_id }
   end
 end
