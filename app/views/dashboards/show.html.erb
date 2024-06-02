@@ -2,4 +2,46 @@
 Dashboard
 <% end %>
 
-This is our dashboard
+<% if @financial_balances.nil? %>
+  <%= link_to 'Create Financial Account', accounts_path, class: "bg-indigo-500 rounded-tl-full rounded-br-full text-white text-md text-center self-center px-4 py-2 m-2"%>
+<% else %>
+  <h3 class="mt-4 text-lg leading-6 font-medium text-gray-900">Financial Account</h3>
+  <div class="bg-white py-24 sm:py-32">
+    <div class="mx-auto max-w-7xl px-6 lg:px-8">
+      <dl class="grid grid-cols-1 gap-x-8 gap-y-16 text-center lg:grid-cols-3">
+        <div class="mx-auto flex max-w-xs flex-col gap-y-4">
+          <dt class="text-base leading-7 text-gray-600">Cash</dt>
+          <dd class="order-first text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl"><%=  number_to_currency(@financial_balances.cash.usd / 100.0 ) %></dd>
+        </div>
+        <div class="mx-auto flex max-w-xs flex-col gap-y-4">
+          <dt class="text-base leading-7 text-gray-600">Inbound Pending</dt>
+          <dd class="order-first text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl"><%=  number_to_currency(@financial_balances.inbound_pending.usd / 100.0 ) %></dd>
+        </div>
+        <div class="mx-auto flex max-w-xs flex-col gap-y-4">
+          <dt class="text-base leading-7 text-gray-600">Outbound Pending</dt>
+          <dd class="order-first text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl"><%=  number_to_currency(@financial_balances.outbound_pending.usd / 100.0 ) %></dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <h3 class="mt-4 text-lg leading-6 font-medium text-gray-900">Payments Balance</h3>
+  <div class="bg-white py-24 sm:py-32">
+    <div class="mx-auto max-w-7xl px-6 lg:px-8">
+      <dl class="grid grid-cols-1 gap-x-8 gap-y-16 text-center lg:grid-cols-3">
+        <div class="mx-auto flex max-w-xs flex-col gap-y-4">
+          <dt class="text-base leading-7 text-gray-600">Available</dt>
+          <dd class="order-first text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl"><%=  number_to_currency(@payments_balances.available.first.amount / 100.0 ) %></dd>
+        </div>
+        <div class="mx-auto flex max-w-xs flex-col gap-y-4">
+          <dt class="text-base leading-7 text-gray-600">Instant Available</dt>
+          <dd class="order-first text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl"><%=  number_to_currency(@payments_balances.instant_available.first.amount / 100.0 ) %></dd>
+        </div>
+        <div class="mx-auto flex max-w-xs flex-col gap-y-4">
+          <dt class="text-base leading-7 text-gray-600">Pending</dt>
+          <dd class="order-first text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl"><%=  number_to_currency(@payments_balances.pending.first.amount/ 100.0 ) %></dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+<% end %>

@@ -62,7 +62,8 @@ class StripeAccount
         header)
   end
 
-  def retrieve_financila_account
+  def retrieve_financial_account
+    return if account.financial_account_id.nil?
     @financial_account ||= Stripe::Treasury::FinancialAccount.retrieve(
       {
         id: account.financial_account_id,
@@ -91,6 +92,16 @@ class StripeAccount
 
     # Updating account's external id
     account.update(external_account_id: bank_account.id)
+  end
+
+  def financial_balances
+    return if retrieve_financial_account.nil?
+
+    retrieve_financial_account.balance
+  end
+
+  def payments_balances
+    @payment_balances ||= Stripe::Balance.retrieve(header)
   end
   def onboarding_url
     Stripe::AccountLink.create({
